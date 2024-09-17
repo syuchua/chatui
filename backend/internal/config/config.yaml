@@ -1,0 +1,52 @@
+# 数据库配置
+database:
+  url: "root:Ma20030104@@tcp(localhost:3306)/chat?parseTime=true"
+
+# 服务器配置
+server:
+  address: ":8080"
+  environment: "development"  # 可以是 "development", "production", 或 "testing"
+
+# JWT 配置
+jwt:
+  secret: "your-secret-key-here"  # 在生产环境中,使用一个强随机字符串
+  expiration: 24h  # Token 有效期
+
+# OpenAI 配置
+openai:
+  api_key: "sk-CdHIE9KpjBk2QO86D7B6E8A3E22b4eB2BaB07544E7Fb80A2"
+  base_url: "https://api.yuchu.me/v1"
+  model: "gemini-1.5-pro-latest"  # 或其他您想使用的模型
+
+# 日志配置
+logging:
+  level: "info"  # 可以是 "debug", "info", "warn", "error"
+  file: "logs/app.log"
+
+# 跨域资源共享 (CORS) 配置
+cors:
+  allowed_origins:
+    - "http://localhost:5173"
+    - "https://chatui.yuchu.me"
+  allowed_methods:
+    - "GET"
+    - "POST"
+    - "PUT"
+    - "DELETE"
+  allowed_headers:
+    - "Origin"
+    - "Content-Type"
+    - "Accept"
+    - "Authorization"
+
+# WebSocket 配置
+websocket:
+  max_message_size: 1024  # 最大消息大小(字节)
+  write_wait: 10s  # 写入超时
+  pong_wait: 60s  # pong 等待时间
+  ping_period: 54s  # ping 周期 (应小于 pong_wait)
+
+# 限流配置
+rate_limit:
+  requests_per_second: 20
+  burst: 20
