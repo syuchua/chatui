@@ -8,11 +8,10 @@ import (
 
 // GenerateJWT 生成JWT
 func GenerateJWT(userID string, secret string) (string, error) {
-	token := jwt.New(jwt.SigningMethodHS256)
-
-	claims := token.Claims.(jwt.MapClaims)
-	claims["user_id"] = userID
-	claims["exp"] = time.Now().Add(time.Hour * 24).Unix() // Token 有效期为 24 小时
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"user_id": userID,
+		"exp":     time.Now().Add(time.Hour * 24 * 7).Unix(), // 7天过期
+	})
 
 	return token.SignedString([]byte(secret))
 }

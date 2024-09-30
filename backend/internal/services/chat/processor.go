@@ -10,15 +10,16 @@ import (
 
 // Processor 处理消息
 type Processor struct {
-	aiService *ai.Service
+	aiService ai.AIService
 	logger    *logrus.Logger
 }
 
 // NewProcessor 创建一个新的Processor实例
-func NewProcessor(aiService *ai.Service, logger *logrus.Logger) *Processor {
+func NewProcessor(aiService ai.AIService, logger *logrus.Logger) *Processor {
 	return &Processor{
 		aiService: aiService,
-		logger:    logger,
+
+		logger: logger,
 	}
 }
 

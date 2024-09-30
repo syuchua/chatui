@@ -12,23 +12,29 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-// Service 定义了一个服务结构体
-type Service struct {
+// AIService 定义了 AI 服务的接口
+type AIService interface {
+	GenerateResponse(messages []models.Message) (string, error)
+}
+
+// OpenAIService 实现了 AIService 接口
+type OpenAIService struct {
 	config *config.Config
 	logger *logrus.Logger
 }
 
-// NewService 创建一个新的服务实例
-func NewService(cfg *config.Config, logger *logrus.Logger) *Service {
-	return &Service{config: cfg, logger: logger}
+// NewService 创建一个新的 AI 服务实例
+func NewService(cfg *config.Config, logger *logrus.Logger) AIService {
+	return &OpenAIService{config: cfg, logger: logger}
 }
 
 // GenerateResponse 生成响应
-func (s *Service) GenerateResponse(messages []models.Message) (string, error) {
+func (s *OpenAIService) GenerateResponse(messages []models.Message) (string, error) {
 	// 构建请求payload
 	payload := map[string]interface{}{
-		"model":    "gpt-3.5-turbo",
+		"model":    "gemini-1.5-pro-latest",
 		"messages": messages,
+		// "stream":   true,
 	}
 
 	jsonPayload, err := json.Marshal(payload)

@@ -6,12 +6,13 @@ import (
 	"github.com/spf13/viper"
 )
 
-// Config 定义了应用程序的配置结构体
+type DatabaseConfig struct {
+	URL string
+}
+
 type Config struct {
-	Database struct {
-		URL string
-	}
-	Server struct {
+	Database DatabaseConfig
+	Server   struct {
 		Address     string
 		Environment string
 	}

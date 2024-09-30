@@ -6,6 +6,8 @@ import (
 	"chatui/backend/internal/db"
 	"chatui/backend/internal/services/ai"
 	"chatui/backend/internal/utils"
+
+	"github.com/sirupsen/logrus"
 )
 
 func main() {
@@ -25,9 +27,16 @@ func main() {
 	utils.Log.Infof("Loaded config: %+v", cfg)
 
 	// 连接到数据库
-	database, err := db.NewDatabase(cfg)
+	logger := logrus.New()
+	database, err := db.NewDatabase(cfg, logger)
 	if err != nil {
 		utils.Log.Fatalf("Failed to connect to database: %v", err)
+	}
+
+	// 执行数据库迁移
+	err = database.MigrateDB()
+	if err != nil {
+		utils.Log.Fatalf("Failed to migrate database: %v", err)
 	}
 
 	// 创建AI服务
@@ -36,4 +45,5 @@ func main() {
 	// 创建服务器
 	server := api.NewServer(cfg, database, aiService)
 	utils.Log.Fatal(server.Start())
+
 }

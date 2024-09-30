@@ -47,15 +47,15 @@ func (h *UserHandler) Register(c *gin.Context) {
 // Login 处理用户登录请求
 func (h *UserHandler) Login(c *gin.Context) {
 	var request struct {
-		Username string `json:"username" binding:"required"`
-		Password string `json:"password" binding:"required"`
+		EmailOrUsername string `json:"emailOrUsername" binding:"required"`
+		Password        string `json:"password" binding:"required"`
 	}
 	if err := c.ShouldBindJSON(&request); err != nil {
 		utils.HandleError(c, utils.NewAppError(http.StatusBadRequest, "INVALID_INPUT", err.Error()))
 		return
 	}
 
-	user, err := h.userService.AuthenticateUser(request.Username, request.Password)
+	user, err := h.userService.AuthenticateUser(request.EmailOrUsername, request.Password)
 	if err != nil {
 		utils.HandleError(c, utils.NewAppError(http.StatusUnauthorized, "INVALID_CREDENTIALS", "Invalid username or password"))
 		return

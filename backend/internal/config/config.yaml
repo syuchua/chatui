@@ -14,9 +14,15 @@ jwt:
 
 # OpenAI 配置
 openai:
+<<<<<<< HEAD
   api_key: "your-api-key"
   base_url: "https://api.openai.com/v1"
   model: "gpt-3.5-turbo"  # 或其他您想使用的模型
+=======
+  api_key: ""
+  base_url: ""
+  model: ""  # 或其他您想使用的模型
+>>>>>>> 825a739 (update1)
 
 # 日志配置
 logging:

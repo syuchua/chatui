@@ -1,0 +1,48 @@
+# 依赖目录
+node_modules
+/frontend/node_modules
+
+# 编译输出
+/frontend/dist
+/backend/bin
+
+# 日志文件
+*.log
+
+# 本地环境文件
+.env.local
+.env.*.local
+
+# 编辑器目录
+.vscode
+.idea
+
+# 操作系统文件
+.DS_Store
+Thumbs.db
+
+# Go 二进制文件
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# 测试二进制文件
+*.test
+
+# 输出文件
+*.out
+
+# 依赖目录
+/vendor/
+
+# Go 工作区文件
+go.work
+
+# 忽略所有 .env.local 文件
+.env.local
+
+# 忽略所有 .env.development.local 文件
+.env.development.local
+

@@ -10,11 +10,11 @@ import (
 
 // Service 用户服务
 type Service struct {
-	db *db.Database
+	db db.Database
 }
 
 // NewService 创建一个新的Service实例
-func NewService(database *db.Database) *Service {
+func NewService(database db.Database) *Service {
 	return &Service{
 		db: database,
 	}

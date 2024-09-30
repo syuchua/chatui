@@ -25,13 +25,13 @@ var upgrader = websocket.Upgrader{
 
 // Handler 处理WebSocket请求
 type Handler struct {
-	db            *db.Database
+	db            db.Database
 	config        *config.Config
 	chatProcessor *chat.Processor
 }
 
 // NewHandler 创建一个新的Handler实例
-func NewHandler(database *db.Database, cfg *config.Config, chatProcessor *chat.Processor) *Handler {
+func NewHandler(database db.Database, cfg *config.Config, chatProcessor *chat.Processor) *Handler {
 	return &Handler{
 		db:            database,
 		config:        cfg,

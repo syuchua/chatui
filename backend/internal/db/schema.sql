@@ -1,0 +1,29 @@
+CREATE TABLE IF NOT EXISTS users (
+    id VARCHAR(255) PRIMARY KEY,
+    username VARCHAR(255) UNIQUE NOT NULL,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    role VARCHAR(50) NOT NULL,
+    base_url VARCHAR(255),
+    api_key VARCHAR(255)
+);
+
+CREATE TABLE IF NOT EXISTS conversations (
+    id VARCHAR(255) PRIMARY KEY,
+    user_id VARCHAR(255) NOT NULL,
+    title VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);
+
+CREATE TABLE IF NOT EXISTS messages (
+    id VARCHAR(255) PRIMARY KEY,
+    conversation_id VARCHAR(255) NOT NULL,
+    user_id VARCHAR(255) NOT NULL,
+    role VARCHAR(50) NOT NULL,
+    content TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (conversation_id) REFERENCES conversations(id),
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);

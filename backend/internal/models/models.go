@@ -11,6 +11,8 @@ type User struct {
 	Email     string    `json:"email"`
 	Password  string    `json:"-"` // 不在JSON中暴露密码
 	Role      string    `json:"role"`
+	BaseURL   string    `json:"base_url"`
+	APIKey    string    `json:"-"` // 不在JSON中暴露API密钥
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
 }

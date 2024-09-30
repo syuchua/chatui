@@ -3,6 +3,7 @@ package handlers
 import (
 	"chatui/backend/internal/config"
 	"chatui/backend/internal/db"
+	"chatui/backend/internal/services/conversation"
 	"chatui/backend/internal/utils"
 	"net/http"
 
@@ -12,14 +13,20 @@ import (
 
 // ConversationHandler 处理与对话相关的请求
 type ConversationHandler struct {
-	db     *db.Database
-	config *config.Config
-	logger *logrus.Logger
+	logger              *logrus.Logger
+	config              *config.Config
+	conversationService conversation.ConversationService
+	db                  db.Database
 }
 
 // NewConversationHandler 创建一个新的ConversationHandler实例
-func NewConversationHandler(database *db.Database, cfg *config.Config, logger *logrus.Logger) *ConversationHandler {
-	return &ConversationHandler{db: database, config: cfg, logger: logger}
+func NewConversationHandler(logger *logrus.Logger, config *config.Config, conversationService conversation.ConversationService, database db.Database) *ConversationHandler {
+	return &ConversationHandler{
+		logger:              logger,
+		config:              config,
+		conversationService: conversationService,
+		db:                  database,
+	}
 }
 
 // GetConversations 获取用户的所有对话
@@ -43,31 +50,16 @@ func (h *ConversationHandler) GetConversationMessages(c *gin.Context) {
 	userID, _ := c.Get("user_id")
 	userIDStr := userID.(string)
 
-	// 开始事务
-	tx, err := h.db.BeginTx()
-	if err != nil {
-		h.logger.WithError(err).Error("Failed to begin transaction")
-		utils.HandleError(c, utils.NewAppError(http.StatusInternalServerError, "DB_ERROR", "Failed to process request"))
-		return
-	}
-	defer tx.Rollback()
-
 	// 验证用户是否有权限访问此对话
-	if !h.db.UserOwnsConversationTx(tx, userIDStr, conversationID) {
+	if !h.db.UserOwnsConversation(userIDStr, conversationID) {
 		utils.HandleError(c, utils.NewAppError(http.StatusForbidden, "FORBIDDEN", "You don't have permission to access this conversation"))
 		return
 	}
 
-	messages, err := h.db.GetConversationMessagesTx(tx, conversationID)
+	messages, err := h.db.GetConversationMessages(conversationID)
 	if err != nil {
 		h.logger.WithError(err).Error("Failed to get conversation messages")
 		utils.HandleError(c, utils.NewAppError(http.StatusInternalServerError, "DB_ERROR", "Failed to get conversation messages"))
-		return
-	}
-
-	if err := tx.Commit(); err != nil {
-		h.logger.WithError(err).Error("Failed to commit transaction")
-		utils.HandleError(c, utils.NewAppError(http.StatusInternalServerError, "DB_ERROR", "Failed to process request"))
 		return
 	}
 
@@ -88,35 +80,44 @@ func (h *ConversationHandler) UpdateConversationTitle(c *gin.Context) {
 	userID, _ := c.Get("user_id")
 	userIDStr := userID.(string)
 
-	// 开始事务
-	tx, err := h.db.BeginTx()
-	if err != nil {
-		h.logger.WithError(err).Error("Failed to begin transaction")
-		utils.HandleError(c, utils.NewAppError(http.StatusInternalServerError, "DB_ERROR", "Failed to process request"))
-		return
-	}
-	defer tx.Rollback()
-
 	// 验证用户是否有权限访问此对话
-	if !h.db.UserOwnsConversationTx(tx, userIDStr, conversationID) {
+	if !h.db.UserOwnsConversation(userIDStr, conversationID) {
 		utils.HandleError(c, utils.NewAppError(http.StatusForbidden, "FORBIDDEN", "You don't have permission to update this conversation"))
 		return
 	}
 
 	// 更新对话标题
-	err = h.db.UpdateConversationTitleTx(tx, conversationID, request.Title)
+	err := h.db.UpdateConversationTitle(conversationID, request.Title)
 	if err != nil {
 		h.logger.WithError(err).Error("Failed to update conversation title")
 		utils.HandleError(c, utils.NewAppError(http.StatusInternalServerError, "DB_ERROR", "Failed to update conversation title"))
 		return
 	}
 
-	// 提交事务
-	if err := tx.Commit(); err != nil {
-		h.logger.WithError(err).Error("Failed to commit transaction")
-		utils.HandleError(c, utils.NewAppError(http.StatusInternalServerError, "DB_ERROR", "Failed to process request"))
+	c.JSON(http.StatusOK, gin.H{"message": "Conversation title updated successfully"})
+}
+
+// StartNewConversation 创建新对话
+func (h *ConversationHandler) StartNewConversation(c *gin.Context) {
+	userID, exists := c.Get("user_id")
+	if !exists {
+		utils.HandleError(c, utils.NewAppError(http.StatusUnauthorized, "UNAUTHORIZED", "User not authenticated"))
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "Conversation title updated successfully"})
+	// 确保 userID 是字符串类型
+	userIDStr, ok := userID.(string)
+	if !ok {
+		utils.HandleError(c, utils.NewAppError(http.StatusInternalServerError, "INTERNAL_ERROR", "Invalid user ID"))
+		return
+	}
+
+	conversation, err := h.conversationService.CreateConversation(userIDStr)
+	if err != nil {
+		h.logger.WithError(err).Error("Failed to create conversation")
+		utils.HandleError(c, utils.NewAppError(http.StatusInternalServerError, "INTERNAL_ERROR", "Failed to create conversation"))
+		return
+	}
+
+	c.JSON(http.StatusCreated, conversation)
 }
