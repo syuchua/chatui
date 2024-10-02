@@ -10,6 +10,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+        token: ${{ secrets.PAT }}
 
     - name: Generate release tag
       id: generate_tag
@@ -33,7 +36,9 @@ jobs:
           ${{ secrets.DOCKER_USERNAME }}/chatui:latest
           ${{ secrets.DOCKER_USERNAME }}/chatui:${{ steps.generate_tag.outputs.RELEASE_TAG }}
 
-    - name: Create Git tag
+    - name: Create Git tag and push
+      env:
+        GITHUB_TOKEN: ${{ secrets.PAT }}
       run: |
         git config user.name github-actions
         git config user.email github-actions@github.com
