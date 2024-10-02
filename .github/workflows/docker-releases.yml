@@ -9,25 +9,36 @@ jobs:
   build-and-release:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
+
+    - name: Generate release tag
+      id: generate_tag
+      run: echo "RELEASE_TAG=release-$(date +'%Y.%m.%d-%H%M')-${GITHUB_SHA::7}" >> $GITHUB_OUTPUT
 
     - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v1
+      uses: docker/setup-buildx-action@v2
 
     - name: Login to DockerHub
-      uses: docker/login-action@v1 
+      uses: docker/login-action@v2 
       with:
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
 
     - name: Build and push Docker image
-      uses: docker/build-push-action@v2
+      uses: docker/build-push-action@v4
       with:
         context: .
         push: true
         tags: |
           ${{ secrets.DOCKER_USERNAME }}/chatui:latest
-          ${{ secrets.DOCKER_USERNAME }}/chatui:${{ github.ref_name }}
+          ${{ secrets.DOCKER_USERNAME }}/chatui:${{ steps.generate_tag.outputs.RELEASE_TAG }}
+
+    - name: Create Git tag
+      run: |
+        git config user.name github-actions
+        git config user.email github-actions@github.com
+        git tag ${{ steps.generate_tag.outputs.RELEASE_TAG }}
+        git push origin ${{ steps.generate_tag.outputs.RELEASE_TAG }}
 
     - name: Create Release
       id: create_release
@@ -35,7 +46,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.PAT }}
       with:
-        tag_name: ${{ github.sha }}
-        release_name: Release ${{ github.sha }}
+        tag_name: ${{ steps.generate_tag.outputs.RELEASE_TAG }}
+        release_name: Release ${{ steps.generate_tag.outputs.RELEASE_TAG }}
         draft: false
         prerelease: false
