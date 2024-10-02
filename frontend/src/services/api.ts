@@ -16,6 +16,13 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
+type UserSettings = {
+  baseUrl: string;
+  apiKey: string;
+  models: string[];
+  selectedModel: string;
+}
+
 export const authService = {
   login: async (emailOrUsername: string, password: string) => {
     const response = await api.post<{ token: string; user: User }>('/login', { emailOrUsername, password });
@@ -52,7 +59,8 @@ export const chatService = {
     return response.data;
   },
   getMessages: async (conversationId: string) => {
-    const response = await api.get<Message[]>(`/conversations/${conversationId}/messages`);
+    const response = await api.get<{messages:Message[]}>(`/conversations/${conversationId}/messages`);
+    console.log('Received messages:', response.data.messages);
     return response.data;
   },
   startNewConversation: async () => {
@@ -66,8 +74,19 @@ export const chatService = {
 };
 
 export const userService = {
-  updateSettings: async (baseUrl: string, apiKey: string, model: string) => {
-    const response = await api.post('/user/settings', { baseUrl, apiKey, model });
+
+  getUserInfo: async () => {
+    const response = await api.get<User>('/user/info');
+    return response.data;
+  },
+
+  getSettings: async () => {
+    const response = await api.get('/user/settings');
+    return response.data;
+  },
+
+  updateSettings: async (settings: UserSettings) => {
+    const response = await api.post('/user/settings', settings);
     return response.data;
   },
 };

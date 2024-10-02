@@ -46,17 +46,34 @@ func (s *Service) RegisterUser(username, email, password string) error {
 }
 
 // AuthenticateUser 认证用户
-func (s *Service) AuthenticateUser(username, password string) (*models.User, error) {
-	user, err := s.db.GetUserByUsername(username)
+func (s *Service) AuthenticateUser(emailOrUsername, password string) (*models.User, error) {
+	var user models.User
+	var err error
+
+	// 尝试通过用户名查找用户
+	user, err = s.db.GetUserByUsername(emailOrUsername)
 	if err != nil {
-		return nil, errors.New("用户名或密码错误")
+		// 如果通过用户名找不到,尝试通过邮箱查找
+		user, err = s.db.GetUserByEmail(emailOrUsername)
+		if err != nil {
+			return nil, errors.New("用户名或邮箱不存在")
+		}
 	}
 
 	// 验证密码
 	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
 	if err != nil {
-		return nil, errors.New("用户名或密码错误")
+		return nil, errors.New("密码错误")
 	}
 
+	return &user, nil
+}
+
+// GetUserByID 根据ID获取用户
+func (s *Service) GetUserByID(userID string) (*models.User, error) {
+	user, err := s.db.GetUserByID(userID)
+	if err != nil {
+		return nil, err
+	}
 	return &user, nil
 }

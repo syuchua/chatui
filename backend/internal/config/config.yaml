@@ -1,6 +1,6 @@
 # 数据库配置
 database:
-  url: "user:passwd@tcp(localhost:3306)/chat?parseTime=true"
+  url: "root:Ma20030104@@tcp(localhost:3306)/chat?parseTime=true"
 
 # 服务器配置
 server:
@@ -14,15 +14,9 @@ jwt:
 
 # OpenAI 配置
 openai:
-<<<<<<< HEAD
-  api_key: "your-api-key"
-  base_url: "https://api.openai.com/v1"
-  model: "gpt-3.5-turbo"  # 或其他您想使用的模型
-=======
-  api_key: ""
-  base_url: ""
-  model: ""  # 或其他您想使用的模型
->>>>>>> 825a739 (update1)
+  api_key: "sk-CdHIE9KpjBk2QO86D7B6E8A3E22b4eB2BaB07544E7Fb80A2"
+  base_url: "https://api.yuchu.me/v1"
+  model: "gpt-4o"  # 或其他您想使用的模型
 
 # 日志配置
 logging:

@@ -9,6 +9,7 @@ import (
 	"chatui/backend/internal/services/conversation"
 	services "chatui/backend/internal/services/session"
 	"chatui/backend/internal/services/user"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
@@ -82,8 +83,17 @@ func (s *Server) setupRoutes() {
 			// protected.GET("/models", s.getModels)
 			protected.POST("/user/settings", s.updateSettings)
 			protected.GET("/user/settings", s.getUserSettings)
+			protected.GET("/user/info", userHandler.GetUserInfo)
 		}
 	}
+
+	// 服务前端静态文件
+	s.router.StaticFS("/", http.Dir("./static"))
+
+	// 对于任何未匹配的路由,返回 index.html
+	s.router.NoRoute(func(c *gin.Context) {
+		c.File("./static/index.html")
+	})
 }
 
 // getModels 获取可用的模型列表

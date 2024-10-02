@@ -79,11 +79,12 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import axios from 'axios'
 import { defineEmits } from 'vue'
-import { authService } from '@/services/api'
+import { authService, userService } from '@/services/api'
 
 const router = useRouter()
 const isLogin = ref<boolean>(true)
 const username = ref<string>('')
+const email = ref<string>('')
 const emailOrUsername = ref<string>('')
 const password = ref<string>('')
 
@@ -98,7 +99,7 @@ interface RegisterData {
   password: string;
 }
 
-const emit = defineEmits(['login', 'register'])
+const emit = defineEmits(['login', 'register', 'update-user'])
 
 const handleSubmit = async (): Promise<void> => {
   try {
@@ -106,10 +107,16 @@ const handleSubmit = async (): Promise<void> => {
       const loginData: LoginData = { emailOrUsername: emailOrUsername.value, password: password.value }
       const response = await authService.login(loginData.emailOrUsername, loginData.password)
       emit('login', response)
+      // 登录成功后立即获取用户信息
+      const userInfo = await userService.getUserInfo()
+      emit('update-user', userInfo)
     } else {
-      const registerData: RegisterData = { username: username.value, email: emailOrUsername.value, password: password.value }
+      const registerData: RegisterData = { username: username.value, email: email.value, password: password.value }
       const response = await authService.register(registerData.username, registerData.email, registerData.password)
       emit('register', response)
+      // 注册成功后也获取用户信息
+      const userInfo = await userService.getUserInfo()
+      emit('update-user', userInfo)
     }
   } catch (error) {
     console.error('Authentication error:', error)
@@ -121,4 +128,5 @@ const handleSubmit = async (): Promise<void> => {
     }
   }
 }
+
 </script>

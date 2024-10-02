@@ -71,3 +71,23 @@ func (h *UserHandler) Login(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"token": token, "user": user})
 }
+
+// GetUserInfo 获取用户信息
+func (h *UserHandler) GetUserInfo(c *gin.Context) {
+	userID, _ := c.Get("user_id")
+	userIDStr := userID.(string)
+
+	user, err := h.userService.GetUserByID(userIDStr)
+	if err != nil {
+		h.logger.WithError(err).Error("Failed to get user info")
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get user info"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"id":       user.ID,
+		"username": user.Username,
+		"email":    user.Email,
+		// 不要返回密码和其他敏感信息
+	})
+}
