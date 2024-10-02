@@ -1,10 +1,11 @@
 # 构建前端
-FROM node:20 as frontend-builder
+FROM node:20 AS frontend-builder
 WORKDIR /frontend
-COPY frontend/package*.json ./
-RUN npm ci --only=production
+COPY frontend/package*.json frontend/yarn.lock ./
+RUN node --version && yarn --version
+RUN yarn install --frozen-lockfile
 COPY frontend .
-RUN npm run build
+RUN yarn build
 
 # 构建后端
 FROM golang:1.23 as backend-builder
