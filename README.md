@@ -21,7 +21,7 @@
    docker-compose up --build
    ```
 
-3. 访问 http://localhost 使用应用
+3. 访问 http://localhost:8080 使用应用
 
 ## 开发
 
