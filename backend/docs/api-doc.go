@@ -1,5 +1,5 @@
 // @title Chat UI API
-// @version 1.0
+// @version 0.1
 // @description This is the API for the Chat UI application.
 // @host localhost:8080
 // @BasePath /api
