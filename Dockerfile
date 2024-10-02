@@ -2,7 +2,7 @@
 FROM node:20 as frontend-builder
 WORKDIR /frontend
 COPY frontend/package*.json ./
-RUN npm install
+RUN npm ci --only=production
 COPY frontend .
 RUN npm run build
 
