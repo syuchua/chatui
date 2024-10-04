@@ -88,7 +88,8 @@ func (s *Server) setupRoutes() {
 	}
 
 	// 服务前端静态文件
-	s.router.StaticFS("/", http.Dir("./static"))
+	s.router.Static("/assets", "./static/assets")
+	s.router.StaticFile("/", "./static/index.html")
 
 	// 对于任何未匹配的路由,返回 index.html
 	s.router.NoRoute(func(c *gin.Context) {
