@@ -9,7 +9,6 @@ import (
 	"chatui/backend/internal/services/conversation"
 	services "chatui/backend/internal/services/session"
 	"chatui/backend/internal/services/user"
-	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
